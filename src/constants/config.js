@@ -2,6 +2,8 @@
 export const BASE_SPEND_ANCHOR = 0;
 export const STEP_SIZE = 30000;
 export const FIXED_AGENCY_FEE = 75000;
+export const AGENCY_FEE_THRESHOLD = 400000;
+export const AGENCY_FEE_PERCENTAGE = 0.20;
 export const TRANS_FEE_RATE = 0.10;
 export const PRICE_PER_DAY = 5;
 
@@ -54,6 +56,20 @@ export const SLIDER_CONFIG = {
     max: 100,
     step: 1,
     label: 'Retention',
+    format: 'percent',
+  },
+  contentCosts: {
+    min: 0,
+    max: 50000,
+    step: 1000,
+    label: 'Content Creation Costs',
+    format: 'currency',
+  },
+  transactionFeeRate: {
+    min: 0,
+    max: 15,
+    step: 0.5,
+    label: 'Transaction & WhatsApp Sending Fees',
     format: 'percent',
   },
 };

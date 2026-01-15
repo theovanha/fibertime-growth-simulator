@@ -14,6 +14,8 @@ const DEFAULT_VALUES = {
   usageDays: 10,
   pricePerDay: 5,
   retention: 85,
+  contentCosts: 0,
+  transactionFeeRate: 10,
 };
 
 function App() {

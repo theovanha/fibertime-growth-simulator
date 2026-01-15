@@ -11,8 +11,9 @@ function generateCSVContent(monthlyData) {
     'Total Users',
     'Revenue',
     'Spend',
+    'Content Costs',
     'Agency Fee',
-    'Transaction Fees',
+    'Transaction & WhatsApp Fees',
     'Profit',
   ];
 
@@ -23,6 +24,7 @@ function generateCSVContent(monthlyData) {
     Math.round(month.totalUsers),
     Math.round(month.revenue),
     Math.round(month.spend),
+    Math.round(month.contentCosts),
     Math.round(month.agencyFee),
     Math.round(month.transactionFee),
     Math.round(month.profit),

@@ -3,6 +3,8 @@ import {
   BASE_SPEND_ANCHOR,
   STEP_SIZE,
   FIXED_AGENCY_FEE,
+  AGENCY_FEE_THRESHOLD,
+  AGENCY_FEE_PERCENTAGE,
   TRANS_FEE_RATE,
 } from '../constants/config';
 
@@ -20,6 +22,8 @@ export function useCalculations(inputs) {
     usageDays,
     pricePerDay,
     retention,
+    contentCosts,
+    transactionFeeRate,
   } = inputs;
 
   return useMemo(() => {
@@ -48,15 +52,19 @@ export function useCalculations(inputs) {
     // Helper function to calculate month metrics (with and without agency fee)
     const calculateMonth = (monthNumber, totalUsers) => {
       const revenue = totalUsers * usageDays * pricePerDay;
-      const transactionFee = revenue * TRANS_FEE_RATE;
-      const agencyFee = FIXED_AGENCY_FEE;
+      const transactionFee = revenue * (transactionFeeRate / 100);
       
-      // All-in costs (includes agency fee)
-      const totalCostAllIn = monthlySpend + transactionFee + agencyFee;
+      // Dynamic agency fee: R75k fixed OR 20% of ad spend if spend > R400k
+      const agencyFee = monthlySpend > AGENCY_FEE_THRESHOLD 
+        ? monthlySpend * AGENCY_FEE_PERCENTAGE 
+        : FIXED_AGENCY_FEE;
+      
+      // All-in costs (includes agency fee + content costs)
+      const totalCostAllIn = monthlySpend + transactionFee + agencyFee + contentCosts;
       const profitAllIn = revenue - totalCostAllIn;
       
-      // Digital-only costs (excludes agency fee)
-      const totalCostDigital = monthlySpend + transactionFee;
+      // Digital-only costs (excludes agency fee, includes content costs)
+      const totalCostDigital = monthlySpend + transactionFee + contentCosts;
       const profitDigital = revenue - totalCostDigital;
 
       return {
@@ -67,6 +75,7 @@ export function useCalculations(inputs) {
         spend: monthlySpend,
         agencyFee,
         transactionFee,
+        contentCosts,
         totalCost: totalCostAllIn,
         profit: profitAllIn,
         profitDigital,
@@ -94,11 +103,14 @@ export function useCalculations(inputs) {
     const monthlyProfit1Year = allMonthlyData[11].profit; // Month 12 only
 
     // === nCAC KPIs ===
-    // Digital nCAC (excludes agency fee)
-    const digitalNCAC = monthlySpend / newUsersPerMonth;
+    // Digital nCAC (excludes agency fee, includes content costs)
+    const digitalNCAC = (monthlySpend + contentCosts) / newUsersPerMonth;
     
-    // All-In nCAC (includes agency fee)
-    const allInNCAC = (monthlySpend + FIXED_AGENCY_FEE) / newUsersPerMonth;
+    // All-In nCAC (includes agency fee + content costs)
+    const currentAgencyFee = monthlySpend > AGENCY_FEE_THRESHOLD 
+      ? monthlySpend * AGENCY_FEE_PERCENTAGE 
+      : FIXED_AGENCY_FEE;
+    const allInNCAC = (monthlySpend + currentAgencyFee + contentCosts) / newUsersPerMonth;
 
     // === PAYBACK KPIs ===
     // Helper function to calculate payback period
@@ -164,5 +176,5 @@ export function useCalculations(inputs) {
       // Chart-ready data
       chartData,
     };
-  }, [monthlySpend, baseCPL, conversionRate, cplPenalty, usageDays, pricePerDay, retention]);
+  }, [monthlySpend, baseCPL, conversionRate, cplPenalty, usageDays, pricePerDay, retention, contentCosts, transactionFeeRate]);
 }

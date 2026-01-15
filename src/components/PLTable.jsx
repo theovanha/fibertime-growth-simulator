@@ -67,8 +67,9 @@ export function PLTable({ monthlyData, allMonthlyData }) {
               <th className="text-right py-3 px-2 text-white/60 font-medium">Total Users</th>
               <th className="text-right py-3 px-2 text-white/60 font-medium">Revenue</th>
               <th className="text-right py-3 px-2 text-white/60 font-medium">Spend</th>
+              <th className="text-right py-3 px-2 text-white/60 font-medium">Content Costs</th>
               <th className="text-right py-3 px-2 text-white/60 font-medium">Agency Fee</th>
-              <th className="text-right py-3 px-2 text-white/60 font-medium">Transaction Fees</th>
+              <th className="text-right py-3 px-2 text-white/60 font-medium">Transaction & WhatsApp Fees</th>
               <th className="text-right py-3 px-2 text-white/60 font-medium">Profit</th>
             </tr>
           </thead>
@@ -92,6 +93,9 @@ export function PLTable({ monthlyData, allMonthlyData }) {
                 </td>
                 <td className="py-3 px-2 text-right text-white/80">
                   {formatCurrency(month.spend)}
+                </td>
+                <td className="py-3 px-2 text-right text-white/80">
+                  {formatCurrency(month.contentCosts)}
                 </td>
                 <td className="py-3 px-2 text-right text-white/80">
                   {formatCurrency(month.agencyFee)}
@@ -121,6 +125,9 @@ export function PLTable({ monthlyData, allMonthlyData }) {
               </td>
               <td className="py-3 px-2 text-right text-white/80">
                 {formatCurrency(displayData.reduce((sum, m) => sum + m.spend, 0))}
+              </td>
+              <td className="py-3 px-2 text-right text-white/80">
+                {formatCurrency(displayData.reduce((sum, m) => sum + m.contentCosts, 0))}
               </td>
               <td className="py-3 px-2 text-right text-white/80">
                 {formatCurrency(displayData.reduce((sum, m) => sum + m.agencyFee, 0))}

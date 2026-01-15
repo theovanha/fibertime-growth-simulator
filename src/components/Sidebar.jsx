@@ -8,7 +8,7 @@ import {
   Settings,
   Info,
 } from 'lucide-react';
-import { SLIDER_CONFIG, FIXED_AGENCY_FEE, TRANS_FEE_RATE, STEP_SIZE } from '../constants/config';
+import { SLIDER_CONFIG, FIXED_AGENCY_FEE, AGENCY_FEE_THRESHOLD, AGENCY_FEE_PERCENTAGE, TRANS_FEE_RATE, STEP_SIZE } from '../constants/config';
 import { formatSliderValue, formatCurrency, formatPercent } from '../utils/formatters';
 
 function SliderInput({ id, value, onChange, config, helperText, info }) {
@@ -128,16 +128,18 @@ export function Sidebar({ inputs, onInputChange }) {
           }`}
         >
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between items-center py-1.5 px-3 bg-white/5 rounded-lg">
-              <span className="text-white/60">Agency Fee</span>
-              <span className="text-yellow font-medium">{formatCurrency(FIXED_AGENCY_FEE)}/month</span>
-            </div>
             <div className="py-1.5 px-3 bg-white/5 rounded-lg">
               <div className="flex justify-between items-center">
-                <span className="text-white/60">Transaction Fee</span>
-                <span className="text-yellow font-medium">{formatPercent(TRANS_FEE_RATE * 100)}</span>
+                <span className="text-white/60">Agency Fee</span>
+                <span className="text-yellow font-medium">
+                  {inputs.monthlySpend > AGENCY_FEE_THRESHOLD 
+                    ? formatPercent(AGENCY_FEE_PERCENTAGE * 100) + ' of spend'
+                    : formatCurrency(FIXED_AGENCY_FEE) + '/month'}
+                </span>
               </div>
-              <p className="text-xs text-white/40 mt-1">Payment processing fee on all revenue</p>
+              <p className="text-xs text-white/40 mt-1">
+                {formatCurrency(FIXED_AGENCY_FEE)}/month or {formatPercent(AGENCY_FEE_PERCENTAGE * 100)} of ad spend (whichever is higher when spend {'>'} {formatCurrency(AGENCY_FEE_THRESHOLD)})
+              </p>
             </div>
           </div>
         </div>
@@ -169,6 +171,19 @@ export function Sidebar({ inputs, onInputChange }) {
         value={inputs.monthlySpend}
         onChange={onInputChange}
         config={SLIDER_CONFIG.monthlySpend}
+      />
+      <SliderInput
+        id="contentCosts"
+        value={inputs.contentCosts}
+        onChange={onInputChange}
+        config={SLIDER_CONFIG.contentCosts}
+      />
+      <SliderInput
+        id="transactionFeeRate"
+        value={inputs.transactionFeeRate}
+        onChange={onInputChange}
+        config={SLIDER_CONFIG.transactionFeeRate}
+        helperText="Payment processing and WhatsApp messaging fees on all revenue"
       />
       <SliderInput
         id="baseCPL"
