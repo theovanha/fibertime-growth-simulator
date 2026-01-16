@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { KPICards } from './components/KPICards';
 import { GrowthChart } from './components/GrowthChart';
 import { PLTable } from './components/PLTable';
+import { ProofOfConcept } from './components/ProofOfConcept';
 import { useCalculations } from './hooks/useCalculations';
 
 // Default input values
@@ -93,6 +94,7 @@ function App() {
           <GrowthChart allMonthlyData={allMonthlyData} />
           <KPICards kpis={kpis} />
           <PLTable monthlyData={monthlyData} allMonthlyData={allMonthlyData} />
+          <ProofOfConcept />
           
           {/* Footer */}
           <footer className="border-t border-white/10 mt-8 py-4">
