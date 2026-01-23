@@ -29,7 +29,7 @@ export default async (request, context) => {
     // Login endpoint
     if (path === '/api/auth/login' && request.method === 'POST') {
       const { password } = await request.json();
-      const correctPassword = Deno.env.get('SITE_PASSWORD') || 'demo2026';
+      const correctPassword = Deno.env.get('SITE_PASSWORD') || 'Fibertime2026';
 
       if (password === correctPassword) {
         const token = generateToken();
