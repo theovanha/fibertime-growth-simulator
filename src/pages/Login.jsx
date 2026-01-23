@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Lock, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import vanhaLogo from '../assets/vanha-logo-white.png';
 import fibertimeLogo from '../assets/fibertime-logo.png';
 
@@ -7,6 +7,25 @@ export function Login({ onLogin }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // #region agent log
+  const fibertimeRef = useRef(null);
+  const vanhaRef = useRef(null);
+  const containerRef = useRef(null);
+  
+  useEffect(() => {
+    if (fibertimeRef.current && vanhaRef.current && containerRef.current) {
+      const ftRect = fibertimeRef.current.getBoundingClientRect();
+      const vhRect = vanhaRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const ftComputed = window.getComputedStyle(fibertimeRef.current);
+      const vhComputed = window.getComputedStyle(vanhaRef.current);
+      
+      fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.jsx:mounted',message:'Logo dimensions on mount',data:{fibertime:{width:ftRect.width,height:ftRect.height,naturalWidth:fibertimeRef.current.naturalWidth,naturalHeight:fibertimeRef.current.naturalHeight,computedHeight:ftComputed.height},vanha:{width:vhRect.width,height:vhRect.height,naturalWidth:vanhaRef.current.naturalWidth,naturalHeight:vanhaRef.current.naturalHeight,computedHeight:vhComputed.height},container:{width:containerRect.width,height:containerRect.height}},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B,C'})}).catch(()=>{});
+    }
+  }, []);
+  // #endregion
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,10 +75,10 @@ export function Login({ onLogin }) {
       <div className="login-card">
         {/* Co-branding Header */}
         <div className="login-branding">
-          <div className="flex items-center justify-center">
-            <img src={fibertimeLogo} alt="FiberTime" className="h-10 object-contain" />
-            <span className="text-white/30 text-xl mx-3">×</span>
-            <img src={vanhaLogo} alt="Vanha" className="h-10 object-contain" />
+          <div ref={containerRef} className="flex flex-col items-center justify-center gap-2">
+            <img ref={fibertimeRef} src={fibertimeLogo} alt="FiberTime" className="h-8 object-contain" />
+            <span className="text-white/20 text-sm">×</span>
+            <img ref={vanhaRef} src={vanhaLogo} alt="Vanha" className="h-14 object-contain" />
           </div>
         </div>
 
@@ -75,20 +94,31 @@ export function Login({ onLogin }) {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Access Code
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your access code"
-              disabled={isLoading}
-              className="form-input"
-              autoFocus
-              required
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your access code"
+                disabled={isLoading}
+                className="form-input pr-12"
+                autoFocus
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5 text-white/40 hover:text-white/60" />
+                ) : (
+                  <Eye className="w-5 h-5 text-white/40 hover:text-white/60" />
+                )}
+              </button>
+            </div>
           </div>
 
           {error && (

@@ -240,17 +240,58 @@ input[type="range"]::-moz-range-thumb {
   width: 100%;
   max-width: 420px;
   background: linear-gradient(135deg, rgba(0, 26, 51, 0.98), rgba(22, 78, 99, 0.95));
-  border: 1px solid rgba(0, 255, 255, 0.2);
+  border: 2px solid transparent;
   border-radius: 1.5rem;
   padding: 2.5rem;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
-  animation: slideUp 0.5s ease-out;
+  animation: border-glow 4s ease-in-out infinite;
+  position: relative;
+  background-clip: padding-box;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  padding: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 255, 0.9),
+    rgba(255, 255, 0, 0.9),
+    rgba(0, 255, 255, 0.9)
+  );
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-flow 3s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes border-glow {
+  0%, 100% {
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 255, 255, 0.24), 0 0 50px rgba(0, 255, 255, 0.12);
+  }
+  50% {
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(0, 255, 255, 0.48), 0 0 75px rgba(0, 255, 255, 0.24);
+  }
 }
 
 .login-branding {
   text-align: center;
   margin-bottom: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: center;
