@@ -93,3 +93,78 @@ input[type="range"]::-moz-range-thumb {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 255, 0.5);
 }
+
+/* Animated gradient button - synced animation for all buttons */
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.btn-gradient-flow {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 255, 0.08),
+    rgba(0, 255, 255, 0.18),
+    rgba(0, 255, 255, 0.28),
+    rgba(0, 255, 255, 0.18),
+    rgba(0, 255, 255, 0.08)
+  );
+  background-size: 200% 100%;
+  animation: gradient-flow 6s ease infinite;
+}
+
+.btn-gradient-flow:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 255, 0.12),
+    rgba(0, 255, 255, 0.22),
+    rgba(0, 255, 255, 0.35),
+    rgba(0, 255, 255, 0.22),
+    rgba(0, 255, 255, 0.12)
+  );
+  background-size: 200% 100%;
+  animation: gradient-flow 4s ease infinite;
+}
+
+/* Table cell highlighting for slider interactions */
+.table-cell-highlighted {
+  font-weight: 600 !important;
+  font-size: 120% !important;
+  color: rgba(0, 255, 255, 0.9) !important;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  z-index: 10;
+}
+
+/* Pulse animation for click interactions */
+@keyframes gentle-pulse {
+  0% {
+    font-weight: 400;
+    color: inherit;
+  }
+  25% {
+    font-weight: 600;
+    color: rgba(0, 255, 255, 0.9);
+  }
+  50% {
+    font-weight: 600;
+    color: rgba(0, 255, 255, 0.9);
+  }
+  100% {
+    font-weight: 400;
+    color: inherit;
+  }
+}
+
+.table-cell-pulse {
+  animation: gentle-pulse 1.2s ease-in-out 1;
+  position: relative;
+  z-index: 10;
+}

@@ -4,30 +4,42 @@
  * @returns {string} CSV content string
  */
 function generateCSVContent(monthlyData) {
-  // CSV header
+  // CSV header (matches P&L table structure)
   const headers = [
     'Month',
-    'New Users',
-    'Total Users',
-    'Revenue',
-    'Spend',
-    'Content Costs',
-    'Agency Fee',
-    'Transaction & WhatsApp Fees',
-    'Profit',
+    'Ad Spend (Retargeting + Brand)',
+    'Ad Spend (Customer Acquisition)',
+    'Total Ad Spend',
+    'Agency + Marketing Overheads',
+    'Total Amount Spent',
+    'CPL',
+    'Total Leads',
+    'Conversion %',
+    'Total New Customers',
+    'Total Active Customers',
+    'Revenue per User per Month',
+    'Total Revenue',
+    'Monthly Profit',
+    'Cumulative Profit',
   ];
 
   // CSV rows - raw numbers only, no formatting
   const rows = monthlyData.map((month) => [
     month.month,
-    Math.round(month.newUsers),
-    Math.round(month.totalUsers),
-    Math.round(month.revenue),
+    Math.round(month.retargetingSpend),
+    Math.round(month.acquisitionSpend),
     Math.round(month.spend),
-    Math.round(month.contentCosts),
-    Math.round(month.agencyFee),
-    Math.round(month.transactionFee),
+    Math.round(month.agencyAndMarketing),
+    Math.round(month.totalAmountSpent),
+    Math.round(month.cpl),
+    Math.round(month.totalLeads),
+    Math.round(month.conversionRatio),
+    Math.round(month.totalCustomers), // Total New Customers
+    Math.round(month.totalUsers), // Total Active Customers
+    Math.round(month.revenuePerUser),
+    Math.round(month.revenue),
     Math.round(month.profit),
+    Math.round(month.cumulativeProfit),
   ]);
 
   // Combine header and rows

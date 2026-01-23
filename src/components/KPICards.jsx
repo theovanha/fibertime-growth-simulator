@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, Target, Clock, Calculator, DollarSign } from 'lucide-react';
+import { TrendingUp, Calculator, DollarSign, Target, Zap } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
 function KPICard({ icon: Icon, title, value, subtitle, isPositive, variant = 'default' }) {
@@ -58,10 +58,11 @@ export function KPICards({ kpis }) {
     monthlyProfit30Day,
     monthlyProfit90Day,
     monthlyProfit1Year,
-    digitalNCAC,
     allInNCAC,
-    digitalPayback,
-    allInPayback,
+    revenuePerUserPerMonth,
+    oneMonthLTVToNCAC,
+    totalLTVToNCAC,
+    ltv,
   } = kpis;
 
   // Select values based on view mode
@@ -126,46 +127,37 @@ export function KPICards({ kpis }) {
         </div>
       </div>
 
-      {/* nCAC Row - 2 columns */}
+      {/* nCAC Row - 4 columns */}
       <div>
-        <SectionLabel>Customer Acquisition Cost (nCAC)</SectionLabel>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <KPICard
-            icon={Target}
-            title="Digital nCAC"
-            value={formatCurrency(digitalNCAC)}
-            subtitle="Spend ÷ New Users (excludes agency)"
-            variant="digital"
-          />
+        <SectionLabel>Customer Acquisition Cost (nCAC) and LTV</SectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <KPICard
             icon={Calculator}
-            title="All-In nCAC"
+            title="nCAC"
             value={formatCurrency(allInNCAC)}
-            subtitle="(Spend + R75k Agency) ÷ New Users"
+            subtitle="(Total Spend + Agency Fee + Content Costs) ÷ New Customers"
             variant="allIn"
-          />
-        </div>
-      </div>
-
-      {/* Payback Row - 2 columns */}
-      <div>
-        <SectionLabel>Payback Period</SectionLabel>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <KPICard
-            icon={Clock}
-            title="Digital Payback"
-            value={digitalPayback}
-            subtitle="How long until ad spend pays for itself"
-            isPositive={digitalPayback !== 'No payback in 1 year'}
-            variant="digital"
           />
           <KPICard
             icon={DollarSign}
-            title="All-In Payback"
-            value={allInPayback}
-            subtitle="How long until all costs pay for themselves"
-            isPositive={allInPayback !== 'No payback in 1 year'}
-            variant="allIn"
+            title="Revenue per User per Month"
+            value={formatCurrency(revenuePerUserPerMonth)}
+            subtitle="Usage Days × Revenue per Day"
+            variant="default"
+          />
+          <KPICard
+            icon={Target}
+            title="1 Month LTV : nCAC"
+            value={`${oneMonthLTVToNCAC.toFixed(2)}x`}
+            subtitle={`${formatCurrency(revenuePerUserPerMonth)} / ${formatCurrency(allInNCAC)}`}
+            variant="default"
+          />
+          <KPICard
+            icon={Zap}
+            title="Total LTV : nCAC"
+            value={`${totalLTVToNCAC.toFixed(2)}x`}
+            subtitle={`${formatCurrency(ltv)} / ${formatCurrency(allInNCAC)}`}
+            variant="default"
           />
         </div>
       </div>

@@ -38,9 +38,18 @@ export function formatDays(value) {
 }
 
 /**
+ * Format months display
+ * @param {number} value - Number of months
+ * @returns {string} Formatted months string (e.g., "1 month" or "6 months")
+ */
+export function formatMonths(value) {
+  return value === 1 ? '1 month' : `${value} months`;
+}
+
+/**
  * Format slider value based on type
  * @param {number} value - The value to format
- * @param {string} format - The format type ('currency', 'percent', 'days')
+ * @param {string} format - The format type ('currency', 'percent', 'days', 'months')
  * @returns {string} Formatted value
  */
 export function formatSliderValue(value, format) {
@@ -51,6 +60,8 @@ export function formatSliderValue(value, format) {
       return formatPercent(value);
     case 'days':
       return `${value} days/month`;
+    case 'months':
+      return formatMonths(value);
     default:
       return String(value);
   }

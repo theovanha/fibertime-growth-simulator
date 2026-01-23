@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 import {
-  BASE_SPEND_ANCHOR,
-  STEP_SIZE,
   FIXED_AGENCY_FEE,
   AGENCY_FEE_THRESHOLD,
   AGENCY_FEE_PERCENTAGE,
@@ -16,76 +14,235 @@ import {
 export function useCalculations(inputs) {
   const {
     monthlySpend,
+    retargetingPercent,
     baseCPL,
     conversionRate,
-    cplPenalty,
     usageDays,
     pricePerDay,
-    retention,
+    retentionMonth2,
+    retentionMonth3,
+    retentionMonth4,
+    retentionMonth5,
+    retentionMonth6,
+    retentionMonth7,
+    retentionMonth8,
+    retentionMonth9,
+    retentionMonth10,
+    retentionMonth11,
+    retentionMonth12,
     contentCosts,
-    transactionFeeRate,
+    otherOverheads,
+    // Spend scaling inputs
+    spendIncreaseMonth2,
+    spendIncreaseMonth3,
+    spendIncreaseMonth4,
+    spendIncreaseMonth5,
+    spendIncreaseMonth6,
+    spendIncreaseMonth7,
+    spendIncreaseMonth8,
+    spendIncreaseMonth9,
+    spendIncreaseMonth10,
+    spendIncreaseMonth11,
+    spendIncreaseMonth12,
+    cplCorrelation,
   } = inputs;
 
   return useMemo(() => {
-    // Step 1: Calculate escalator steps (diminishing returns)
-    const steps = Math.max(0, Math.floor((monthlySpend - BASE_SPEND_ANCHOR) / STEP_SIZE));
+    // Step 1: Build spend increase array for each month
+    const spendIncreases = [
+      0, // Month 1 (baseline, no increase)
+      spendIncreaseMonth2,
+      spendIncreaseMonth3,
+      spendIncreaseMonth4,
+      spendIncreaseMonth5,
+      spendIncreaseMonth6,
+      spendIncreaseMonth7,
+      spendIncreaseMonth8,
+      spendIncreaseMonth9,
+      spendIncreaseMonth10,
+      spendIncreaseMonth11,
+      spendIncreaseMonth12,
+    ];
 
-    // Step 2: Calculate adjusted CPL with escalator
-    const adjCPL = baseCPL * (1 + (cplPenalty / 100) * steps);
-
-    // Step 3: Calculate nCAC (net Customer Acquisition Cost)
-    const nCAC = adjCPL / (conversionRate / 100);
-
-    // Step 4: Calculate new users per month (same each month)
-    const newUsersPerMonth = monthlySpend / nCAC;
-
-    // Step 5: Calculate user totals for 12 months with retention compounding
-    const totalUsersArray = [];
-    let prevTotalUsers = 0;
+    // Step 2: Calculate monthly spend for each month (cumulative scaling)
+    const monthlySpendArray = [];
+    let currentSpend = monthlySpend;
     for (let i = 0; i < 12; i++) {
-      const retained = prevTotalUsers * (retention / 100);
-      const totalUsers = retained + newUsersPerMonth;
-      totalUsersArray.push(totalUsers);
-      prevTotalUsers = totalUsers;
+      monthlySpendArray.push(currentSpend);
+      if (i < 11) { // Don't scale after month 12
+        currentSpend = currentSpend * (1 + spendIncreases[i + 1] / 100);
+      }
     }
 
-    // Helper function to calculate month metrics (with and without agency fee)
-    const calculateMonth = (monthNumber, totalUsers) => {
-      const revenue = totalUsers * usageDays * pricePerDay;
-      const transactionFee = revenue * (transactionFeeRate / 100);
+    // Step 3: Calculate CPL for each month (scales with spend based on correlation)
+    const cplArray = [];
+    let currentCPL = baseCPL;
+    for (let i = 0; i < 12; i++) {
+      cplArray.push(currentCPL);
+      if (i < 11) { // Don't scale after month 12
+        const spendIncreasePct = spendIncreases[i + 1] / 100;
+        const cplIncreasePct = spendIncreasePct * (cplCorrelation / 100);
+        currentCPL = currentCPL * (1 + cplIncreasePct);
+      }
+    }
+
+    // Step 4: For backwards compatibility, keep initial values for first month
+    const acquisitionSpend = monthlySpendArray[0] * (1 - retargetingPercent / 100);
+    const retargetingSpend = monthlySpendArray[0] * (retargetingPercent / 100);
+
+    // Step 5: Calculate nCAC (net Customer Acquisition Cost) for Month 1
+    const nCAC = cplArray[0] / (conversionRate / 100);
+
+    // Step 6: Calculate new users per month for Month 1 (for sidebar display)
+    const newUsersPerMonth = acquisitionSpend / nCAC;
+
+    // Step 7: Build retention curve (Month 1 is always 100%, then user-defined rates)
+    const retentionCurve = [
+      100, // Month 1 (always 100%)
+      retentionMonth2,
+      retentionMonth3,
+      retentionMonth4,
+      retentionMonth5,
+      retentionMonth6,
+      retentionMonth7,
+      retentionMonth8,
+      retentionMonth9,
+      retentionMonth10,
+      retentionMonth11,
+      retentionMonth12,
+    ];
+
+    // Step 8: Calculate revenue per user per month
+    const revenuePerUserPerMonth = usageDays * pricePerDay;
+
+    // Step 9: Calculate LTV as sum of expected revenue across retention curve
+    const ltv = retentionCurve.reduce((sum, retention) => {
+      return sum + (retention / 100) * revenuePerUserPerMonth;
+    }, 0);
+
+    // Step 10: Calculate new users per month for each month (using scaled spend/CPL)
+    const newUsersPerMonthArray = [];
+    for (let i = 0; i < 12; i++) {
+      const monthSpend = monthlySpendArray[i];
+      const monthCPL = cplArray[i];
+      const monthAcquisitionSpend = monthSpend * (1 - retargetingPercent / 100);
+      const monthNCAC = monthCPL / (conversionRate / 100);
+      const monthNewUsers = monthAcquisitionSpend / monthNCAC;
+      newUsersPerMonthArray.push(monthNewUsers);
+    }
+
+    // Step 11: Track all cohorts and their retention over time (with month-specific new users)
+    const cohortData = [];
+    
+    for (let startMonth = 0; startMonth < 12; startMonth++) {
+      const cohort = {
+        month: startMonth + 1,
+        initialUsers: newUsersPerMonthArray[startMonth],
+        monthlyUsers: [] // Users from this cohort in each subsequent month
+      };
       
-      // Dynamic agency fee: R75k fixed OR 20% of ad spend if spend > R400k
-      const agencyFee = monthlySpend > AGENCY_FEE_THRESHOLD 
-        ? monthlySpend * AGENCY_FEE_PERCENTAGE 
+      for (let currentMonth = startMonth; currentMonth < 12; currentMonth++) {
+        const monthsElapsed = currentMonth - startMonth;
+        const retentionRate = retentionCurve[monthsElapsed] / 100;
+        const activeUsers = newUsersPerMonthArray[startMonth] * retentionRate;
+        cohort.monthlyUsers.push({
+          month: currentMonth + 1,
+          users: activeUsers,
+          retentionRate: retentionCurve[monthsElapsed]
+        });
+      }
+      
+      cohortData.push(cohort);
+    }
+    
+    // Step 12: Calculate total active users per month (sum of all cohorts with month-specific acquisitions)
+    const totalUsersArray = [];
+    for (let month = 0; month < 12; month++) {
+      let totalActive = 0;
+      // Sum users from all cohorts that have started by this month
+      for (let cohortIdx = 0; cohortIdx <= month; cohortIdx++) {
+        const monthsElapsed = month - cohortIdx;
+        totalActive += newUsersPerMonthArray[cohortIdx] * (retentionCurve[monthsElapsed] / 100);
+      }
+      totalUsersArray.push(totalActive);
+    }
+
+    // Helper function to calculate month metrics (with month-specific values)
+    const calculateMonth = (monthNumber, totalUsers, monthSpend, monthCPL, monthNewUsers) => {
+      const revenue = totalUsers * usageDays * pricePerDay;
+      
+      // Month-specific acquisition and retargeting spend
+      const monthAcquisitionSpend = monthSpend * (1 - retargetingPercent / 100);
+      const monthRetargetingSpend = monthSpend * (retargetingPercent / 100);
+      
+      // Dynamic agency fee: R120k fixed OR 20% of ad spend if spend > R600k
+      const agencyFee = monthSpend > AGENCY_FEE_THRESHOLD 
+        ? monthSpend * AGENCY_FEE_PERCENTAGE 
         : FIXED_AGENCY_FEE;
       
-      // All-in costs (includes agency fee + content costs)
-      const totalCostAllIn = monthlySpend + transactionFee + agencyFee + contentCosts;
+      // Marketing overheads (combined content costs + other overheads)
+      const marketingOverheads = contentCosts + otherOverheads;
+      
+      // Combined agency fee + marketing overheads
+      const agencyAndMarketing = agencyFee + marketingOverheads;
+      
+      // Total amount spent (all costs)
+      const totalAmountSpent = monthSpend + agencyFee + marketingOverheads;
+      
+      // Acquisition metrics (using month-specific CPL and spend)
+      // Round CPL to nearest 10 cents for better visibility
+      const cpl = Math.round(monthCPL / 0.10) * 0.10;
+      const totalLeads = monthAcquisitionSpend / monthCPL;
+      const conversionRatio = conversionRate;
+      const totalCustomers = monthNewUsers;
+      
+      // Revenue metrics
+      const revenuePerUser = usageDays * pricePerDay;
+      
+      // All-in costs (includes agency fee + marketing overheads)
+      const totalCostAllIn = monthSpend + agencyFee + marketingOverheads;
       const profitAllIn = revenue - totalCostAllIn;
       
-      // Digital-only costs (excludes agency fee, includes content costs)
-      const totalCostDigital = monthlySpend + transactionFee + contentCosts;
+      // Digital-only costs (excludes agency fee, includes marketing overheads)
+      const totalCostDigital = monthSpend + marketingOverheads;
       const profitDigital = revenue - totalCostDigital;
 
       return {
         month: monthNumber,
-        newUsers: newUsersPerMonth,
-        totalUsers,
-        revenue,
-        spend: monthlySpend,
+        spend: monthSpend,
+        retargetingSpend: monthRetargetingSpend,
+        acquisitionSpend: monthAcquisitionSpend,
         agencyFee,
-        transactionFee,
+        marketingOverheads,
+        agencyAndMarketing,
         contentCosts,
-        totalCost: totalCostAllIn,
+        otherOverheads,
+        totalAmountSpent,
+        cpl,
+        totalLeads,
+        conversionRatio,
+        totalCustomers,
+        revenuePerUser,
+        revenue,
         profit: profitAllIn,
+        // Legacy fields for backwards compatibility
+        newUsers: monthNewUsers,
+        totalUsers,
+        totalCost: totalCostAllIn,
         profitDigital,
         totalCostDigital,
       };
     };
 
-    // Calculate all 12 months
+    // Calculate all 12 months (with month-specific spend, CPL, and new users)
     const allMonthlyData = totalUsersArray.map((totalUsers, index) => 
-      calculateMonth(index + 1, totalUsers)
+      calculateMonth(
+        index + 1,
+        totalUsers,
+        monthlySpendArray[index],
+        cplArray[index],
+        newUsersPerMonthArray[index]
+      )
     );
 
     // First 3 months for display in table/chart
@@ -103,14 +260,19 @@ export function useCalculations(inputs) {
     const monthlyProfit1Year = allMonthlyData[11].profit; // Month 12 only
 
     // === nCAC KPIs ===
-    // Digital nCAC (excludes agency fee, includes content costs)
-    const digitalNCAC = (monthlySpend + contentCosts) / newUsersPerMonth;
+    // Use Month 1 values for KPI display
+    const month1Spend = monthlySpendArray[0];
+    const month1AcquisitionSpend = month1Spend * (1 - retargetingPercent / 100);
+    const month1NewUsers = newUsersPerMonthArray[0];
     
-    // All-In nCAC (includes agency fee + content costs)
-    const currentAgencyFee = monthlySpend > AGENCY_FEE_THRESHOLD 
-      ? monthlySpend * AGENCY_FEE_PERCENTAGE 
+    // Digital nCAC (excludes agency fee, includes content costs only)
+    const digitalNCAC = (month1AcquisitionSpend + contentCosts) / month1NewUsers;
+    
+    // All-In nCAC (includes agency fee + content costs, excludes other overheads)
+    const currentAgencyFee = month1Spend > AGENCY_FEE_THRESHOLD 
+      ? month1Spend * AGENCY_FEE_PERCENTAGE 
       : FIXED_AGENCY_FEE;
-    const allInNCAC = (monthlySpend + currentAgencyFee + contentCosts) / newUsersPerMonth;
+    const allInNCAC = (month1Spend + currentAgencyFee + contentCosts) / month1NewUsers;
 
     // === PAYBACK KPIs ===
     // Helper function to calculate payback period
@@ -141,8 +303,6 @@ export function useCalculations(inputs) {
 
     return {
       // Raw calculation values
-      steps,
-      adjCPL,
       nCAC,
       newUsersPerMonth,
 
@@ -171,10 +331,29 @@ export function useCalculations(inputs) {
         // Payback metrics
         digitalPayback,
         allInPayback,
+        
+        // LTV metric
+        ltv,
+        
+        // Revenue and LTV:nCAC ratios
+        revenuePerUserPerMonth: usageDays * pricePerDay,
+        oneMonthLTVToNCAC: (usageDays * pricePerDay) / allInNCAC,
+        totalLTVToNCAC: ltv / allInNCAC,
       },
 
       // Chart-ready data
       chartData,
+      
+      // Cohort tracking data for cohort analysis table
+      cohortData,
     };
-  }, [monthlySpend, baseCPL, conversionRate, cplPenalty, usageDays, pricePerDay, retention, contentCosts, transactionFeeRate]);
+  }, [
+    monthlySpend, retargetingPercent, baseCPL, conversionRate, usageDays, pricePerDay,
+    retentionMonth2, retentionMonth3, retentionMonth4, retentionMonth5, retentionMonth6,
+    retentionMonth7, retentionMonth8, retentionMonth9, retentionMonth10, retentionMonth11, retentionMonth12,
+    contentCosts, otherOverheads,
+    spendIncreaseMonth2, spendIncreaseMonth3, spendIncreaseMonth4, spendIncreaseMonth5, spendIncreaseMonth6,
+    spendIncreaseMonth7, spendIncreaseMonth8, spendIncreaseMonth9, spendIncreaseMonth10, spendIncreaseMonth11, spendIncreaseMonth12,
+    cplCorrelation
+  ]);
 }
