@@ -53,8 +53,15 @@ const MIN_SIDEBAR_WIDTH = 280;
 const MAX_SIDEBAR_WIDTH = 600;
 const DEFAULT_SIDEBAR_WIDTH = 320;
 
+console.log('[DEBUG] App.jsx - Module loaded, about to define App component');
+
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+  console.log('[DEBUG] App.jsx - App component rendering, initial check');
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const authenticated = isAuthenticated();
+    console.log('[DEBUG] App.jsx - Initial isAuthenticated check:', authenticated);
+    return authenticated;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState(DEFAULT_VALUES);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);

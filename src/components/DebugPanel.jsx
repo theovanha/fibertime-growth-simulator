@@ -1,6 +1,46 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronUp, Copy, Trash2, X } from 'lucide-react';
 
+// Global log buffer to capture logs before component mounts
+const globalLogBuffer = [];
+
+// Intercept console.log immediately (before React even starts)
+if (typeof window !== 'undefined' && !window.__debugPanelInitialized) {
+  window.__debugPanelInitialized = true;
+  const originalLog = console.log;
+  const originalError = console.error;
+  
+  console.log = function(...args) {
+    originalLog.apply(console, args);
+    const message = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+    ).join(' ');
+    
+    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+    globalLogBuffer.push({ timestamp, message, type: 'log' });
+  };
+
+  console.error = function(...args) {
+    originalError.apply(console, args);
+    const message = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+    ).join(' ');
+    
+    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+    globalLogBuffer.push({ timestamp, message: `❌ ERROR: ${message}`, type: 'error' });
+  };
+
+  // Capture unhandled errors
+  window.addEventListener('error', (event) => {
+    const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+    globalLogBuffer.push({ 
+      timestamp, 
+      message: `❌ UNHANDLED ERROR: ${event.message} at ${event.filename}:${event.lineno}`, 
+      type: 'error' 
+    });
+  });
+}
+
 export function DebugPanel() {
   const [logs, setLogs] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -9,28 +49,20 @@ export function DebugPanel() {
   const logsEndRef = useRef(null);
 
   useEffect(() => {
-    // Intercept console.log to capture debug messages
-    const originalLog = console.log;
-    console.log = function(...args) {
-      // Call original console.log
-      originalLog.apply(console, args);
-      
-      // Capture [DEBUG] messages
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ');
-      
-      if (message.includes('[DEBUG]')) {
-        const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-        setLogs(prev => [...prev, { timestamp, message }]);
-      }
-    };
+    // Load buffered logs
+    if (globalLogBuffer.length > 0) {
+      setLogs([...globalLogBuffer]);
+    }
 
-    // Cleanup on unmount
-    return () => {
-      console.log = originalLog;
-    };
-  }, []);
+    // Set up periodic sync with global buffer
+    const interval = setInterval(() => {
+      if (globalLogBuffer.length > logs.length) {
+        setLogs([...globalLogBuffer]);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [logs.length]);
 
   // Auto-scroll to bottom when new logs arrive
   useEffect(() => {
