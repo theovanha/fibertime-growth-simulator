@@ -74,11 +74,26 @@ function App() {
 
   // Handle successful login
   const handleLogin = useCallback(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:handleLogin:called',message:'handleLogin invoked',data:{isLoggedInBefore:isLoggedIn,isLoadingBefore:isLoading},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+    // #endregion
     setIsLoading(true);
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:handleLogin:setLoadingTrue',message:'setIsLoading(true) called',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     // Small delay to show loader animation
     setTimeout(() => {
+      // #region agent log
+      fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:handleLogin:timeoutFired',message:'setTimeout callback executing',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+      // #endregion
       setIsLoggedIn(true);
+      // #region agent log
+      fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:handleLogin:setLoggedInTrue',message:'setIsLoggedIn(true) called',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       setIsLoading(false);
+      // #region agent log
+      fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:handleLogin:setLoadingFalse',message:'setIsLoading(false) called',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
     }, 800);
   }, []);
 
@@ -95,11 +110,17 @@ function App() {
 
   // Show login page if not authenticated
   if (!isLoggedIn) {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:render:notLoggedIn',message:'Rendering Login component',data:{isLoggedIn,isLoading},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+    // #endregion
     return <Login onLogin={handleLogin} />;
   }
 
   // Show loader while transitioning
   if (isLoading) {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:render:loading',message:'Showing loading screen',data:{isLoading,isLoggedIn},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     return (
       <div className="min-h-screen flex items-center justify-center bg-navy">
         <div className="text-center">
@@ -109,6 +130,10 @@ function App() {
       </div>
     );
   }
+
+  // #region agent log
+  fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:render:mainApp',message:'Rendering main app',data:{isLoggedIn,isLoading},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+  // #endregion
 
   // Handle individual slider changes
   const handleInputChange = useCallback((id, value) => {
