@@ -5,7 +5,6 @@ import { GrowthChart } from './components/GrowthChart';
 import { PLTable } from './components/PLTable';
 import { CohortTable } from './components/CohortTable';
 import { SaveModal } from './components/SaveModal';
-import { DebugPanel } from './components/DebugPanel';
 import { useCalculations } from './hooks/useCalculations';
 import { ChevronLeft, ChevronRight, GripVertical, Save, LogOut } from 'lucide-react';
 import { Login } from './pages/Login';
@@ -53,15 +52,8 @@ const MIN_SIDEBAR_WIDTH = 280;
 const MAX_SIDEBAR_WIDTH = 600;
 const DEFAULT_SIDEBAR_WIDTH = 320;
 
-console.log('[DEBUG] App.jsx - Module loaded, about to define App component');
-
 function App() {
-  console.log('[DEBUG] App.jsx - App component rendering, initial check');
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const authenticated = isAuthenticated();
-    console.log('[DEBUG] App.jsx - Initial isAuthenticated check:', authenticated);
-    return authenticated;
-  });
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState(DEFAULT_VALUES);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
@@ -82,16 +74,11 @@ function App() {
 
   // Handle successful login
   const handleLogin = useCallback(() => {
-    console.log('[DEBUG] App.jsx:handleLogin:called - handleLogin invoked', {isLoggedInBefore:isLoggedIn,isLoadingBefore:isLoading});
     setIsLoading(true);
-    console.log('[DEBUG] App.jsx:handleLogin:setLoadingTrue - setIsLoading(true) called');
     // Small delay to show loader animation
     setTimeout(() => {
-      console.log('[DEBUG] App.jsx:handleLogin:timeoutFired - setTimeout callback executing');
       setIsLoggedIn(true);
-      console.log('[DEBUG] App.jsx:handleLogin:setLoggedInTrue - setIsLoggedIn(true) called');
       setIsLoading(false);
-      console.log('[DEBUG] App.jsx:handleLogin:setLoadingFalse - setIsLoading(false) called');
     }, 800);
   }, []);
 
@@ -228,32 +215,20 @@ function App() {
 
   // Show login page if not authenticated
   if (!isLoggedIn) {
-    console.log('[DEBUG] App.jsx:render:notLoggedIn - Rendering Login component', {isLoggedIn,isLoading});
-    return (
-      <>
-        <Login onLogin={handleLogin} />
-        <DebugPanel />
-      </>
-    );
+    return <Login onLogin={handleLogin} />;
   }
 
   // Show loader while transitioning
   if (isLoading) {
-    console.log('[DEBUG] App.jsx:render:loading - Showing loading screen', {isLoading,isLoggedIn});
     return (
-      <>
-        <div className="min-h-screen flex items-center justify-center bg-navy">
-          <div className="text-center">
-            <div className="loader mb-4"></div>
-            <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-navy">
+        <div className="text-center">
+          <div className="loader mb-4"></div>
+          <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
         </div>
-        <DebugPanel />
-      </>
+      </div>
     );
   }
-
-  console.log('[DEBUG] App.jsx:render:mainApp - Rendering main app', {isLoggedIn,isLoading});
 
   return (
     <div className="h-screen flex flex-col lg:flex-row bg-navy overflow-hidden">
@@ -416,8 +391,6 @@ function App() {
         isSaving={isSaving}
       />
 
-      {/* Debug Panel */}
-      <DebugPanel />
     </div>
   );
 }

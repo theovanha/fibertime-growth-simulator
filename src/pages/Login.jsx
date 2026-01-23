@@ -32,9 +32,6 @@ export function Login({ onLogin }) {
     setError('');
     setIsLoading(true);
 
-    // #region agent log
-    console.log('[DEBUG] Login.jsx:handleSubmit:entry - Login attempt started', {isDev:window.location.hostname==='localhost',hostname:window.location.hostname});
-    // #endregion
 
     try {
       // Local development fallback (default password: demo2026)
@@ -44,6 +41,7 @@ export function Login({ onLogin }) {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
         localStorage.setItem('auth_token', 'dev_token_' + Date.now());
+        localStorage.setItem('auth_timestamp', Date.now().toString());
         onLogin();
         setIsLoading(false);
         return;
@@ -59,19 +57,12 @@ export function Login({ onLogin }) {
 
       const data = await response.json();
 
-      // #region agent log
-      console.log('[DEBUG] Login.jsx:handleSubmit:afterFetch - API response received', {responseOk:response.ok,status:response.status,dataSuccess:data.success,hasToken:!!data.token,dataKeys:Object.keys(data),fullData:data});
-      // #endregion
 
       if (response.ok && data.success) {
-        // #region agent log
-        console.log('[DEBUG] Login.jsx:handleSubmit:beforeOnLogin - About to call onLogin callback', {tokenStored:!!localStorage.getItem('auth_token')});
-        // #endregion
-        // Store session token
+        // Store session token with timestamp
         localStorage.setItem('auth_token', data.token);
-        console.log('[DEBUG] Login.jsx:handleSubmit:callingOnLogin - Calling onLogin() now');
+        localStorage.setItem('auth_timestamp', Date.now().toString());
         onLogin();
-        console.log('[DEBUG] Login.jsx:handleSubmit:afterOnLogin - onLogin callback completed');
       } else {
         setError('Invalid access code. Please try again.');
         setPassword('');
@@ -102,7 +93,7 @@ export function Login({ onLogin }) {
             <Lock className="w-6 h-6 text-cyan animate-pulse-slow" />
           </div>
           <h2 className="login-title">Growth Simulation Model</h2>
-          <p className="login-subtitle">Secure Demo Access</p>
+          <p className="login-subtitle">Secure Access</p>
         </div>
 
         {/* Login Form */}
@@ -153,7 +144,7 @@ export function Login({ onLogin }) {
                 Validating...
               </>
             ) : (
-              'Access Demo'
+              'Access Growth Sim'
             )}
           </button>
         </form>
