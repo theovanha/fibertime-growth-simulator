@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { SLIDER_CONFIG, FIXED_AGENCY_FEE, AGENCY_FEE_THRESHOLD, AGENCY_FEE_PERCENTAGE, TRANS_FEE_RATE } from '../constants/config';
 import { formatSliderValue, formatCurrency, formatPercent } from '../utils/formatters';
+import { SavedSettings } from './SavedSettings';
 
 function SliderInput({ id, value, onChange, config, helperText, info, onDragStart, onDragEnd, onClick }) {
   return (
@@ -92,7 +93,8 @@ function InfoTooltip({ text }) {
 
 export function Sidebar({ 
   inputs, 
-  onInputChange, 
+  onInputChange,
+  onLoadSettings,
   calculatedNCAC, 
   newUsersPerMonth, 
   retentionExpanded, 
@@ -592,6 +594,12 @@ export function Sidebar({
           </div>
         </div>
       </div>
+
+      {/* Saved Settings - at bottom */}
+      <SavedSettings
+        currentSettings={inputs}
+        onLoadSettings={onLoadSettings}
+      />
     </aside>
   );
 }

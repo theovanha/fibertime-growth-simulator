@@ -68,6 +68,11 @@ function App() {
     setInputs((prev) => ({ ...prev, [id]: value }));
   }, []);
 
+  // Handle loading saved settings
+  const loadSavedSettings = useCallback((settingsData) => {
+    setInputs(settingsData);
+  }, []);
+
   // Handle slider drag start (for table highlighting)
   const handleSliderDragStart = useCallback((sliderId) => {
     setActiveSlider(sliderId);
@@ -230,6 +235,7 @@ function App() {
             <Sidebar
               inputs={inputs}
               onInputChange={handleInputChange}
+              onLoadSettings={loadSavedSettings}
               calculatedNCAC={kpis.allInNCAC}
               newUsersPerMonth={newUsersPerMonth}
               retentionExpanded={retentionExpanded}
