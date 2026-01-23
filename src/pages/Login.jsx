@@ -34,10 +34,10 @@ export function Login({ onLogin }) {
 
 
     try {
-      // Local development fallback (default password: demo2026)
+      // Local development fallback (default password: Fibertime2026)
       const isDevelopment = window.location.hostname === 'localhost';
       
-      if (isDevelopment && password === 'demo2026') {
+      if (isDevelopment && password === 'Fibertime2026') {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
         localStorage.setItem('auth_token', 'dev_token_' + Date.now());
