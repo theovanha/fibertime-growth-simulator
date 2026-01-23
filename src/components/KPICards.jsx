@@ -150,7 +150,7 @@ export function KPICards({ kpis }) {
             title="Lifetime LTV"
             value={formatCurrency(ltv)}
             subtitle="Based on retention drop-off curve"
-            variant="default"
+            variant="allIn"
           />
           <KPICard
             icon={Target}
