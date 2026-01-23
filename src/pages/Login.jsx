@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lock, AlertCircle } from 'lucide-react';
 import vanhaLogo from '../assets/vanha-logo-white.png';
+import fibertimeLogo from '../assets/fibertime-logo.png';
 
 export function Login({ onLogin }) {
   const [password, setPassword] = useState('');
@@ -56,12 +57,9 @@ export function Login({ onLogin }) {
         {/* Co-branding Header */}
         <div className="login-branding">
           <div className="flex items-center justify-center">
-            <h1 className="text-2xl font-bold whitespace-nowrap">
-              <span className="text-cyan">fiber</span>
-              <span className="text-yellow">time</span>
-            </h1>
-            <span className="text-white/30 text-xl ml-4 mr-3">×</span>
-            <img src={vanhaLogo} alt="Vanha" className="h-10 object-contain -ml-3" />
+            <img src={fibertimeLogo} alt="FiberTime" className="h-10 object-contain" />
+            <span className="text-white/30 text-xl mx-3">×</span>
+            <img src={vanhaLogo} alt="Vanha" className="h-10 object-contain" />
           </div>
         </div>
 

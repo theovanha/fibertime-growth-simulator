@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, GripVertical, Save, LogOut } from 'lucide-re
 import { Login } from './pages/Login';
 import { isAuthenticated, logout } from './utils/auth';
 import { saveSettings } from './services/settingsService';
+import fibertimeLogo from './assets/fibertime-logo.png';
 
 // Default input values
 const DEFAULT_VALUES = {
@@ -53,6 +54,7 @@ const DEFAULT_SIDEBAR_WIDTH = 320;
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+  const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState(DEFAULT_VALUES);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -72,7 +74,12 @@ function App() {
 
   // Handle successful login
   const handleLogin = useCallback(() => {
-    setIsLoggedIn(true);
+    setIsLoading(true);
+    // Small delay to show loader animation
+    setTimeout(() => {
+      setIsLoggedIn(true);
+      setIsLoading(false);
+    }, 800);
   }, []);
 
   // Handle quick save from header
@@ -89,6 +96,18 @@ function App() {
   // Show login page if not authenticated
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
+  }
+
+  // Show loader while transitioning
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-navy">
+        <div className="text-center">
+          <div className="loader mb-4"></div>
+          <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
+        </div>
+      </div>
+    );
   }
 
   // Handle individual slider changes
@@ -240,10 +259,7 @@ function App() {
           <div className="lg:hidden border-b border-white/10 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-white">
-                  <span className="text-cyan">fiber</span>
-                  <span className="text-yellow">time</span>
-                </h1>
+                <img src={fibertimeLogo} alt="FiberTime" className="h-8 object-contain mb-1" />
                 <p className="text-xs text-white/50">Growth Simulation Model</p>
               </div>
               <div className="text-right">
@@ -300,11 +316,10 @@ function App() {
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-white mb-1">
-                  <span className="text-cyan">fiber</span>
-                  <span className="text-yellow">time</span>
-                  <span className="text-white/50 font-normal text-lg ml-3">Growth Simulation Model</span>
-                </h1>
+                <div className="flex items-center gap-3 mb-1">
+                  <img src={fibertimeLogo} alt="FiberTime" className="h-8 object-contain" />
+                  <span className="text-white/50 font-normal text-lg">Growth Simulation Model</span>
+                </div>
                 <p className="text-white/50 text-sm">
                   Drag the sliders to test different scenarios. See how changing spend, pricing, or retention 
                   affects your profit over 12 months.
@@ -355,11 +370,8 @@ function App() {
           {/* Footer */}
           <footer className="border-t border-white/10 mt-8 py-6">
             <div className="flex flex-col items-center gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">
-                  <span className="text-cyan font-semibold">fiber</span>
-                  <span className="text-yellow font-semibold">time</span>
-                </span>
+              <div className="flex items-center gap-3">
+                <img src={fibertimeLogo} alt="FiberTime" className="h-6 object-contain" />
                 <span className="text-white/30">×</span>
                 <span className="text-white/70 text-sm font-semibold tracking-wide">VANHA</span>
               </div>
