@@ -5,6 +5,7 @@ import { GrowthChart } from './components/GrowthChart';
 import { PLTable } from './components/PLTable';
 import { CohortTable } from './components/CohortTable';
 import { SaveModal } from './components/SaveModal';
+import { DebugPanel } from './components/DebugPanel';
 import { useCalculations } from './hooks/useCalculations';
 import { ChevronLeft, ChevronRight, GripVertical, Save, LogOut } from 'lucide-react';
 import { Login } from './pages/Login';
@@ -118,7 +119,12 @@ function App() {
     // #region agent log
     fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:render:notLoggedIn',message:'Rendering Login component',data:{isLoggedIn,isLoading},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
     // #endregion
-    return <Login onLogin={handleLogin} />;
+    return (
+      <>
+        <Login onLogin={handleLogin} />
+        <DebugPanel />
+      </>
+    );
   }
 
   // Show loader while transitioning
@@ -127,12 +133,15 @@ function App() {
     fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.jsx:render:loading',message:'Showing loading screen',data:{isLoading,isLoggedIn},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
     // #endregion
     return (
-      <div className="min-h-screen flex items-center justify-center bg-navy">
-        <div className="text-center">
-          <div className="loader mb-4"></div>
-          <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
+      <>
+        <div className="min-h-screen flex items-center justify-center bg-navy">
+          <div className="text-center">
+            <div className="loader mb-4"></div>
+            <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
+          </div>
         </div>
-      </div>
+        <DebugPanel />
+      </>
     );
   }
 
@@ -420,6 +429,9 @@ function App() {
         onSave={handleQuickSave}
         isSaving={isSaving}
       />
+
+      {/* Debug Panel */}
+      <DebugPanel />
     </div>
   );
 }
