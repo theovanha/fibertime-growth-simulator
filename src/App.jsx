@@ -106,35 +106,6 @@ function App() {
     }
   }, [inputs]);
 
-  // Show login page if not authenticated
-  if (!isLoggedIn) {
-    console.log('[DEBUG] App.jsx:render:notLoggedIn - Rendering Login component', {isLoggedIn,isLoading});
-    return (
-      <>
-        <Login onLogin={handleLogin} />
-        <DebugPanel />
-      </>
-    );
-  }
-
-  // Show loader while transitioning
-  if (isLoading) {
-    console.log('[DEBUG] App.jsx:render:loading - Showing loading screen', {isLoading,isLoggedIn});
-    return (
-      <>
-        <div className="min-h-screen flex items-center justify-center bg-navy">
-          <div className="text-center">
-            <div className="loader mb-4"></div>
-            <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
-          </div>
-        </div>
-        <DebugPanel />
-      </>
-    );
-  }
-
-  console.log('[DEBUG] App.jsx:render:mainApp - Rendering main app', {isLoggedIn,isLoading});
-
   // Handle individual slider changes
   const handleInputChange = useCallback((id, value) => {
     setInputs((prev) => ({ ...prev, [id]: value }));
@@ -254,6 +225,35 @@ function App() {
       document.body.style.userSelect = '';
     };
   }, [isResizing]);
+
+  // Show login page if not authenticated
+  if (!isLoggedIn) {
+    console.log('[DEBUG] App.jsx:render:notLoggedIn - Rendering Login component', {isLoggedIn,isLoading});
+    return (
+      <>
+        <Login onLogin={handleLogin} />
+        <DebugPanel />
+      </>
+    );
+  }
+
+  // Show loader while transitioning
+  if (isLoading) {
+    console.log('[DEBUG] App.jsx:render:loading - Showing loading screen', {isLoading,isLoggedIn});
+    return (
+      <>
+        <div className="min-h-screen flex items-center justify-center bg-navy">
+          <div className="text-center">
+            <div className="loader mb-4"></div>
+            <p className="text-white/60 text-sm">Loading Growth Simulation Model...</p>
+          </div>
+        </div>
+        <DebugPanel />
+      </>
+    );
+  }
+
+  console.log('[DEBUG] App.jsx:render:mainApp - Rendering main app', {isLoggedIn,isLoading});
 
   return (
     <div className="h-screen flex flex-col lg:flex-row bg-navy overflow-hidden">
