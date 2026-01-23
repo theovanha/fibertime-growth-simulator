@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lock, AlertCircle } from 'lucide-react';
-import vanhaLogo from '../assets/vanha-logo-white.svg';
+import vanhaLogo from '../assets/vanha-logo-white.png';
 
 export function Login({ onLogin }) {
   const [password, setPassword] = useState('');
@@ -13,7 +13,19 @@ export function Login({ onLogin }) {
     setIsLoading(true);
 
     try {
-      // Call auth API
+      // Local development fallback (default password: demo2026)
+      const isDevelopment = window.location.hostname === 'localhost';
+      
+      if (isDevelopment && password === 'demo2026') {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        localStorage.setItem('auth_token', 'dev_token_' + Date.now());
+        onLogin();
+        setIsLoading(false);
+        return;
+      }
+
+      // Call auth API for production
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,22 +55,22 @@ export function Login({ onLogin }) {
       <div className="login-card">
         {/* Co-branding Header */}
         <div className="login-branding">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">
+          <div className="flex items-center justify-center">
+            <h1 className="text-2xl font-bold whitespace-nowrap">
               <span className="text-cyan">fiber</span>
               <span className="text-yellow">time</span>
             </h1>
-            <span className="text-white/40 text-2xl font-light">×</span>
-            <img src={vanhaLogo} alt="Vanha" className="h-10" />
+            <span className="text-white/30 text-xl ml-4 mr-3">×</span>
+            <img src={vanhaLogo} alt="Vanha" className="h-10 object-contain -ml-3" />
           </div>
         </div>
 
         {/* Title */}
         <div className="login-header">
           <div className="login-icon">
-            <Lock className="w-6 h-6 text-cyan" />
+            <Lock className="w-6 h-6 text-cyan animate-pulse-slow" />
           </div>
-          <h2 className="login-title">Growth Command Center</h2>
+          <h2 className="login-title">Growth Simulation Model</h2>
           <p className="login-subtitle">Secure Demo Access</p>
         </div>
 

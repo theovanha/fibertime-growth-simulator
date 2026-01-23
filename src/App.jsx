@@ -244,7 +244,7 @@ function App() {
                   <span className="text-cyan">fiber</span>
                   <span className="text-yellow">time</span>
                 </h1>
-                <p className="text-xs text-white/50">Growth Command Center</p>
+                <p className="text-xs text-white/50">Growth Simulation Model</p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-white/40">12-Month Simulator</p>
@@ -303,7 +303,7 @@ function App() {
                 <h1 className="text-2xl font-bold text-white mb-1">
                   <span className="text-cyan">fiber</span>
                   <span className="text-yellow">time</span>
-                  <span className="text-white/50 font-normal text-lg ml-3">Growth Command Center</span>
+                  <span className="text-white/50 font-normal text-lg ml-3">Growth Simulation Model</span>
                 </h1>
                 <p className="text-white/50 text-sm">
                   Drag the sliders to test different scenarios. See how changing spend, pricing, or retention 
@@ -364,7 +364,7 @@ function App() {
                 <span className="text-white/70 text-sm font-semibold tracking-wide">VANHA</span>
               </div>
               <p className="text-center text-xs text-white/30">
-                Growth Command Center • Professional Modeling for Strategic Planning
+                Growth Simulation Model • Professional Modeling for Strategic Planning
               </p>
             </div>
           </footer>
