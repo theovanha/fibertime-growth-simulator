@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, Calculator, DollarSign, Target, Zap } from 'lucide-react';
+import { TrendingUp, Calculator, DollarSign, Target, Zap, Trophy } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
 function KPICard({ icon: Icon, title, value, subtitle, isPositive, variant = 'default' }) {
@@ -127,10 +127,10 @@ export function KPICards({ kpis }) {
         </div>
       </div>
 
-      {/* nCAC Row - 4 columns */}
+      {/* nCAC Row - 5 columns */}
       <div>
         <SectionLabel>Customer Acquisition Cost (nCAC) and LTV</SectionLabel>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           <KPICard
             icon={Calculator}
             title="nCAC"
@@ -143,6 +143,13 @@ export function KPICards({ kpis }) {
             title="Revenue per User per Month"
             value={formatCurrency(revenuePerUserPerMonth)}
             subtitle="Usage Days × Revenue per Day"
+            variant="default"
+          />
+          <KPICard
+            icon={Trophy}
+            title="Lifetime LTV"
+            value={formatCurrency(ltv)}
+            subtitle="Based on retention drop-off curve"
             variant="default"
           />
           <KPICard
