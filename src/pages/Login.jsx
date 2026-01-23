@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lock, AlertCircle } from 'lucide-react';
-import vanhaLogo from '../assets/vanha-logo.svg';
+import vanhaLogo from '../assets/vanha-logo-white.svg';
 
 export function Login({ onLogin }) {
   const [password, setPassword] = useState('');
@@ -49,8 +49,7 @@ export function Login({ onLogin }) {
               <span className="text-yellow">time</span>
             </h1>
             <span className="text-white/40 text-2xl font-light">×</span>
-            <img src={vanhaLogo} alt="Vanha" className="h-8 w-8" />
-            <span className="text-white text-xl font-semibold tracking-wide">VANHA</span>
+            <img src={vanhaLogo} alt="Vanha" className="h-10" />
           </div>
         </div>
 
