@@ -3,8 +3,6 @@
  * Handles login and token verification
  */
 
-import { Context } from "https://edge.netlify.com";
-
 // Generate a simple session token
 function generateToken() {
   return btoa(Date.now() + Math.random().toString()).slice(0, 32);
