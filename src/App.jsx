@@ -4,8 +4,12 @@ import { KPICards } from './components/KPICards';
 import { GrowthChart } from './components/GrowthChart';
 import { PLTable } from './components/PLTable';
 import { CohortTable } from './components/CohortTable';
+import { SaveModal } from './components/SaveModal';
 import { useCalculations } from './hooks/useCalculations';
-import { ChevronLeft, ChevronRight, GripVertical } from 'lucide-react';
+import { ChevronLeft, ChevronRight, GripVertical, Save, LogOut } from 'lucide-react';
+import { Login } from './pages/Login';
+import { isAuthenticated, logout } from './utils/auth';
+import { saveSettings } from './services/settingsService';
 
 // Default input values
 const DEFAULT_VALUES = {
@@ -48,6 +52,7 @@ const MAX_SIDEBAR_WIDTH = 600;
 const DEFAULT_SIDEBAR_WIDTH = 320;
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [inputs, setInputs] = useState(DEFAULT_VALUES);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -55,6 +60,8 @@ function App() {
   const [retentionExpanded, setRetentionExpanded] = useState(false);
   const [activeSlider, setActiveSlider] = useState(null);
   const [pulseSlider, setPulseSlider] = useState(null);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const sidebarRef = useRef(null);
   const retentionSectionRef = useRef(null);
   const cohortTableRef = useRef(null);
@@ -62,6 +69,27 @@ function App() {
   const plTableRef = useRef(null);
   const sidebarScrollRef = useRef(null);
   const mainPanelScrollRef = useRef(null);
+
+  // Handle successful login
+  const handleLogin = useCallback(() => {
+    setIsLoggedIn(true);
+  }, []);
+
+  // Handle quick save from header
+  const handleQuickSave = useCallback(async (name) => {
+    setIsSaving(true);
+    const result = await saveSettings(name, inputs);
+    setIsSaving(false);
+    
+    if (result.success) {
+      setIsSaveModalOpen(false);
+    }
+  }, [inputs]);
+
+  // Show login page if not authenticated
+  if (!isLoggedIn) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   // Handle individual slider changes
   const handleInputChange = useCallback((id, value) => {
@@ -282,8 +310,22 @@ function App() {
                   affects your profit over 12 months.
                 </p>
               </div>
-              <div className="text-right flex-shrink-0 ml-8">
-                <p className="text-xs text-white/40">12-Month Simulator</p>
+              <div className="flex items-center gap-3 flex-shrink-0 ml-8">
+                <button
+                  onClick={() => setIsSaveModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan/10 hover:bg-cyan/20 border border-cyan/40 rounded-lg text-cyan text-sm font-semibold transition-all"
+                  title="Save current settings"
+                >
+                  <Save className="w-4 h-4" />
+                  Save Settings
+                </button>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg text-white/60 hover:text-white text-sm transition-all"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -311,13 +353,31 @@ function App() {
           />
           
           {/* Footer */}
-          <footer className="border-t border-white/10 mt-8 py-4">
-            <p className="text-center text-xs text-white/30">
-              fibertime Growth Simulator • Built for C-Suite Strategic Planning
-            </p>
+          <footer className="border-t border-white/10 mt-8 py-6">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">
+                  <span className="text-cyan font-semibold">fiber</span>
+                  <span className="text-yellow font-semibold">time</span>
+                </span>
+                <span className="text-white/30">×</span>
+                <span className="text-white/70 text-sm font-semibold tracking-wide">VANHA</span>
+              </div>
+              <p className="text-center text-xs text-white/30">
+                Growth Command Center • Professional Modeling for Strategic Planning
+              </p>
+            </div>
           </footer>
         </div>
       </div>
+
+      {/* Quick Save Modal */}
+      <SaveModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        onSave={handleQuickSave}
+        isSaving={isSaving}
+      />
     </div>
   );
 }
