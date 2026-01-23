@@ -33,6 +33,7 @@ export function Login({ onLogin }) {
     setIsLoading(true);
 
     // #region agent log
+    console.log('[DEBUG] Login.jsx:handleSubmit:entry - Login attempt started', {isDev:window.location.hostname==='localhost',hostname:window.location.hostname});
     fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.jsx:handleSubmit:entry',message:'Login attempt started',data:{isDev:window.location.hostname==='localhost',hostname:window.location.hostname},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
     // #endregion
 
@@ -66,16 +67,20 @@ export function Login({ onLogin }) {
       const data = await response.json();
 
       // #region agent log
+      console.log('[DEBUG] Login.jsx:handleSubmit:afterFetch - API response received', {responseOk:response.ok,status:response.status,dataSuccess:data.success,hasToken:!!data.token,dataKeys:Object.keys(data),fullData:data});
       fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.jsx:handleSubmit:afterFetch',message:'API response received',data:{responseOk:response.ok,status:response.status,dataSuccess:data.success,hasToken:!!data.token,dataKeys:Object.keys(data)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
       // #endregion
 
       if (response.ok && data.success) {
         // #region agent log
+        console.log('[DEBUG] Login.jsx:handleSubmit:beforeOnLogin - About to call onLogin callback', {tokenStored:!!localStorage.getItem('auth_token')});
         fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.jsx:handleSubmit:beforeOnLogin',message:'About to call onLogin callback',data:{tokenStored:!!localStorage.getItem('auth_token')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B,C'})}).catch(()=>{});
         // #endregion
         // Store session token
         localStorage.setItem('auth_token', data.token);
+        console.log('[DEBUG] Login.jsx:handleSubmit:callingOnLogin - Calling onLogin() now');
         onLogin();
+        console.log('[DEBUG] Login.jsx:handleSubmit:afterOnLogin - onLogin callback completed');
         // #region agent log
         fetch('http://127.0.0.1:7246/ingest/150fb983-4dc4-4174-a2e2-b2de1b9cdad7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.jsx:handleSubmit:afterOnLogin',message:'onLogin callback completed',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
         // #endregion
